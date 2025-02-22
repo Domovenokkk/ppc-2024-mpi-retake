@@ -11,58 +11,57 @@
 
 namespace mezhuev_m_lattice_torus_mpi {
 
-bool GridTorusTopologyParallel::PreProcessingImpl() { return true; }
+bool GridTorusTopologyParallel::PreProcessingImpl() {
+  if (world_.rank() != 0) {
+    return true;
+  }
+
+  if (task_data == nullptr || task_data->inputs.empty() || task_data->outputs.empty()) {
+    return false;
+  }
+
+  for (size_t i = 0; i < task_data->inputs.size(); ++i) {
+    if (task_data->inputs[i] == nullptr || task_data->inputs_count[i] == 0) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < task_data->outputs.size(); ++i) {
+    if (task_data->outputs[i] == nullptr || task_data->outputs_count[i] == 0) {
+      return false;
+    }
+  }
+
+  size_t total_input_size = 0;
+  size_t total_output_size = 0;
+
+  for (size_t i = 0; i < task_data->inputs_count.size(); ++i) {
+    total_input_size += task_data->inputs_count[i];
+  }
+  for (size_t i = 0; i < task_data->outputs_count.size(); ++i) {
+    total_output_size += task_data->outputs_count[i];
+  }
+
+  if (total_input_size != total_output_size) {
+    return false;
+  }
+
+  return true;
+}
 
 bool GridTorusTopologyParallel::ValidationImpl() {
   bool local_valid = true;
 
   if (world_.rank() == 0) {
-    if (task_data == nullptr || task_data->inputs.empty() || task_data->outputs.empty()) {
-      local_valid = false;
-    } else {
-      for (size_t i = 0; i < task_data->inputs.size(); ++i) {
-        if (task_data->inputs[i] == nullptr || task_data->inputs_count[i] == 0) {
-          local_valid = false;
-          break;
-        }
-      }
-
-      if (local_valid) {
-        for (size_t i = 0; i < task_data->outputs.size(); ++i) {
-          if (task_data->outputs[i] == nullptr || task_data->outputs_count[i] == 0) {
-            local_valid = false;
-            break;
-          }
-        }
-      }
-
-      if (local_valid) {
-        size_t total_input_size = 0;
-        size_t total_output_size = 0;
-
-        for (size_t i = 0; i < task_data->inputs_count.size(); ++i) {
-          total_input_size += task_data->inputs_count[i];
-        }
-        for (size_t i = 0; i < task_data->outputs_count.size(); ++i) {
-          total_output_size += task_data->outputs_count[i];
-        }
-
-        if (total_input_size != total_output_size) {
-          local_valid = false;
-        }
-      }
-
-      if (local_valid && world_.size() > 4) {
-        int grid_dim = static_cast<int>(std::sqrt(world_.size()));
-        if (grid_dim * grid_dim != world_.size()) {
-          local_valid = false;
-        }
+    if (world_.size() > 4) {
+      int grid_dim = static_cast<int>(std::sqrt(world_.size()));
+      if (grid_dim * grid_dim != world_.size()) {
+        local_valid = false;
       }
     }
   }
 
   bool global_valid = false;
-  // NOLINTNEXTLINE(misc-include-cleaner)
   boost::mpi::all_reduce(world_, local_valid, global_valid, std::logical_and<>());
   return global_valid;
 }

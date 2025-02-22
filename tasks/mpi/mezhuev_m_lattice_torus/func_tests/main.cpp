@@ -53,7 +53,7 @@ TEST(mezhuev_m_lattice_torus_mpi, MismatchedInputOutputSizes) {
 
   mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel task(task_data);
 
-  EXPECT_FALSE(task.ValidationImpl());
+  EXPECT_FALSE(task.PreProcessingImpl());
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, TestPreProcessing) {
@@ -143,11 +143,7 @@ TEST(mezhuev_m_lattice_torus_mpi, TestUnmatchedInputOutputSizesWithLargeData) {
 
   mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel task(task_data);
 
-  bool validation_impl_result = task.ValidationImpl();
-  bool final_result = false;
-  // NOLINTNEXTLINE(misc-include-cleaner)
-  boost::mpi::all_reduce(world, validation_impl_result, final_result, std::logical_and<>());
-  EXPECT_FALSE(final_result);
+  EXPECT_FALSE(task.PreProcessingImpl());
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, TestHandlingOfUnsupportedDataTypes) {
@@ -168,7 +164,7 @@ TEST(mezhuev_m_lattice_torus_mpi, TestHandlingOfUnsupportedDataTypes) {
 
   mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel task(task_data);
 
-  EXPECT_FALSE(task.ValidationImpl());
+  EXPECT_FALSE(task.PreProcessingImpl());
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, HandleInvalidData) {
@@ -185,7 +181,7 @@ TEST(mezhuev_m_lattice_torus_mpi, HandleInvalidData) {
 
   mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel task(task_data);
 
-  EXPECT_FALSE(task.ValidationImpl());
+  EXPECT_FALSE(task.PreProcessingImpl());
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, HandleDifferentDataTypes) {
@@ -206,7 +202,7 @@ TEST(mezhuev_m_lattice_torus_mpi, HandleDifferentDataTypes) {
 
   mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel task(task_data);
 
-  EXPECT_FALSE(task.ValidationImpl());
+  EXPECT_FALSE(task.PreProcessingImpl());
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, InvalidGridDimensions) {
