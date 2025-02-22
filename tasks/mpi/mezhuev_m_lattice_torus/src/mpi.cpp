@@ -42,11 +42,7 @@ bool GridTorusTopologyParallel::PreProcessingImpl() {
     total_output_size += task_data->outputs_count[i];
   }
 
-  if (total_input_size != total_output_size) {
-    return false;
-  }
-
-  return true;
+  return total_input_size == total_output_size;
 }
 
 bool GridTorusTopologyParallel::ValidationImpl() {
@@ -62,6 +58,7 @@ bool GridTorusTopologyParallel::ValidationImpl() {
   }
 
   bool global_valid = false;
+  // NOLINTNEXTLINE(misc-include-cleaner)
   boost::mpi::all_reduce(world_, local_valid, global_valid, std::logical_and<>());
   return global_valid;
 }
