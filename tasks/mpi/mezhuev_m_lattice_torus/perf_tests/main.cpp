@@ -13,7 +13,7 @@
 #include "mpi/mezhuev_m_lattice_torus/include/mpi.hpp"
 
 TEST(mezhuev_m_lattice_torus_mpi, test_pipeline_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 2000;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
   std::vector<uint8_t> out(kCount * kCount, 0);
@@ -31,7 +31,7 @@ TEST(mezhuev_m_lattice_torus_mpi, test_pipeline_run) {
   auto test_task_mpi = std::make_shared<mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 5;
+  perf_attr->num_running = 20;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -53,7 +53,7 @@ TEST(mezhuev_m_lattice_torus_mpi, test_pipeline_run) {
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, test_task_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 2000;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
   std::vector<uint8_t> out(kCount * kCount, 0);
@@ -71,7 +71,7 @@ TEST(mezhuev_m_lattice_torus_mpi, test_task_run) {
   auto test_task_mpi = std::make_shared<mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 5;
+  perf_attr->num_running = 20;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
