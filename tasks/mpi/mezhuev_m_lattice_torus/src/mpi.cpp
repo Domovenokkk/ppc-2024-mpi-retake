@@ -1,8 +1,8 @@
 #include "mpi/mezhuev_m_lattice_torus/include/mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
