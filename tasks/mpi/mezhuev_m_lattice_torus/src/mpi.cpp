@@ -16,11 +16,12 @@ bool GridTorusTopologyParallel::PreProcessingImpl() { return true; }
 bool GridTorusTopologyParallel::ValidationImpl() {
   bool local_valid = true;
   if (world_.rank() == 0) {
-    if (!(task_data && !task_data->inputs.empty() && !task_data->inputs_count.empty() && !task_data->outputs.empty() &&
-          !task_data->outputs_count.empty())) {
+    if (task_data == nullptr || task_data->inputs.empty() || task_data->inputs_count.empty() ||
+        task_data->outputs.empty() || task_data->outputs_count.empty()) {
       local_valid = false;
     } else {
-      size_t total_input_size = 0, total_output_size = 0;
+      size_t total_input_size = 0;
+      size_t total_output_size = 0;
       for (size_t i = 0; i < task_data->inputs_count.size(); ++i) {
         if (task_data->inputs[i] == nullptr || task_data->inputs_count[i] == 0 ||
             (reinterpret_cast<uintptr_t>(task_data->inputs[i]) % alignof(uint8_t)) != 0) {
@@ -56,7 +57,6 @@ bool GridTorusTopologyParallel::ValidationImpl() {
   return global_valid;
 }
 
-
 bool GridTorusTopologyParallel::RunImpl() {
   int rank = world_.rank();
   int size = world_.size();
@@ -75,7 +75,7 @@ bool GridTorusTopologyParallel::RunImpl() {
 
   world_.barrier();
 
-auto compute_neighbors = [grid_dim, size](int rank) -> std::vector<int> {
+  auto compute_neighbors = [grid_dim, size](int rank) -> std::vector<int> {
     int x = rank % grid_dim;
     int y = rank / grid_dim;
 
