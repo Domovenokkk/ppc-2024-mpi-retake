@@ -1,17 +1,24 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <numeric>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/mezhuev_m_lattice_torus/include/mpi.hpp"
 
 TEST(mezhuev_m_lattice_torus_mpi, DataTransferTest) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
@@ -31,7 +38,9 @@ TEST(mezhuev_m_lattice_torus_mpi, DataTransferTest) {
 
 TEST(mezhuev_m_lattice_torus_mpi, MismatchedInputOutputSizes) {
   boost::mpi::communicator world;
-  if (world.size() < 2) return;
+  if (world.size() < 2) {
+    return;
+  }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
@@ -68,8 +77,9 @@ TEST(mezhuev_m_lattice_torus_mpi, TestPreProcessing) {
 
 TEST(mezhuev_m_lattice_torus_mpi, TestLargeGridProcessing) {
   boost::mpi::communicator world;
-
-  if (world.size() < 16) return;
+  if (world.size() < 16) {
+    return;
+  }
 
   std::vector<uint8_t> input_data(16);
   std::iota(input_data.begin(), input_data.end(), 9);
@@ -91,7 +101,9 @@ TEST(mezhuev_m_lattice_torus_mpi, TestLargeGridProcessing) {
 
 TEST(mezhuev_m_lattice_torus_mpi, TestIterationOnMaxGridSize) {
   boost::mpi::communicator world;
-  if (world.size() < 16) return;
+  if (world.size() < 16) {
+    return;
+  }
 
   int max_size = 256;
   std::vector<uint8_t> input_data(max_size);
@@ -114,8 +126,9 @@ TEST(mezhuev_m_lattice_torus_mpi, TestIterationOnMaxGridSize) {
 
 TEST(mezhuev_m_lattice_torus_mpi, TestUnmatchedInputOutputSizesWithLargeData) {
   boost::mpi::communicator world;
-
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   size_t large_size = 1024 * 1024;
   std::vector<uint8_t> input_data(large_size);
@@ -131,20 +144,20 @@ TEST(mezhuev_m_lattice_torus_mpi, TestUnmatchedInputOutputSizesWithLargeData) {
 
   mezhuev_m_lattice_torus_mpi::GridTorusTopologyParallel task(task_data);
 
-  bool ValidationImpl_result = task.ValidationImpl();
-
-  bool final_result;
-  boost::mpi::all_reduce(world, ValidationImpl_result, final_result, std::logical_and<>());
-
+  bool validation_impl_result = task.ValidationImpl();
+  bool final_result = false;
+  boost::mpi::all_reduce(world, validation_impl_result, final_result, std::logical_and<>());
   EXPECT_FALSE(final_result);
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, TestHandlingOfUnsupportedDataTypes) {
   boost::mpi::communicator world;
-  if (world.size() < 2) return;
+  if (world.size() < 2) {
+    return;
+  }
 
   std::vector<float> unsupported_input_data(4);
-  std::iota(unsupported_input_data.begin(), unsupported_input_data.end(), 1.0f);
+  std::iota(unsupported_input_data.begin(), unsupported_input_data.end(), 1.0F);
   std::vector<uint8_t> output_data(4);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -177,11 +190,12 @@ TEST(mezhuev_m_lattice_torus_mpi, HandleInvalidData) {
 
 TEST(mezhuev_m_lattice_torus_mpi, HandleDifferentDataTypes) {
   boost::mpi::communicator world;
-
-  if (world.size() < 2) return;
+  if (world.size() < 2) {
+    return;
+  }
 
   std::vector<float> input_data(4);
-  std::iota(input_data.begin(), input_data.end(), 1.0f);
+  std::iota(input_data.begin(), input_data.end(), 1.0F);
   std::vector<uint8_t> output_data(4);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -233,7 +247,9 @@ TEST(mezhuev_m_lattice_torus_mpi, TestPreProcessingSuccess) {
 
 TEST(mezhuev_m_lattice_torus_mpi, RunImpl_SingleProcess) {
   boost::mpi::communicator world;
-  if (world.size() != 1) return;
+  if (world.size() != 1) {
+    return;
+  }
 
   std::vector<uint8_t> input_data(10);
   std::iota(input_data.begin(), input_data.end(), 100);
@@ -255,7 +271,9 @@ TEST(mezhuev_m_lattice_torus_mpi, RunImpl_SingleProcess) {
 
 TEST(mezhuev_m_lattice_torus_mpi, FullPipeline_SmallGrid) {
   boost::mpi::communicator world;
-  if (world.size() < 2 || world.size() > 4) return;
+  if (world.size() < 2 || world.size() > 4) {
+    return;
+  }
 
   std::vector<uint8_t> input_data(8, 55);
   std::vector<uint8_t> output_data(8, 0);
