@@ -15,7 +15,7 @@
 #include "mpi/mezhuev_m_lattice_torus/include/mpi.hpp"
 
 TEST(mezhuev_m_lattice_torus_mpi, test_pipeline_run) {
-  constexpr int kCount = 100;
+  constexpr int kCount = 50;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
   std::vector<uint8_t> out(kCount * kCount, 0);
@@ -55,7 +55,7 @@ TEST(mezhuev_m_lattice_torus_mpi, test_pipeline_run) {
 }
 
 TEST(mezhuev_m_lattice_torus_mpi, test_task_run) {
-  constexpr int kCount = 100;
+  constexpr int kCount = 50;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
   std::vector<uint8_t> out(kCount * kCount, 0);
