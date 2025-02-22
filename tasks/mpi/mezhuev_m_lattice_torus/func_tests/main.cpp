@@ -2,7 +2,6 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -146,6 +145,7 @@ TEST(mezhuev_m_lattice_torus_mpi, TestUnmatchedInputOutputSizesWithLargeData) {
 
   bool validation_impl_result = task.ValidationImpl();
   bool final_result = false;
+  // NOLINTNEXTLINE(misc-include-cleaner)
   boost::mpi::all_reduce(world, validation_impl_result, final_result, std::logical_and<>());
   EXPECT_FALSE(final_result);
 }
