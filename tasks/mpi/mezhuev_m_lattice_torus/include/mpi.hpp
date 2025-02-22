@@ -27,4 +27,4 @@ class GridTorusTopologyParallel : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 
-}  // namespace mezhuev_m_lattice_torus
+}  // namespace mezhuev_m_lattice_torus_mpi
