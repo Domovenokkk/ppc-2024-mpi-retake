@@ -16,29 +16,30 @@ bool GridTorusTopologyParallel::PreProcessingImpl() { return true; }
 bool GridTorusTopologyParallel::ValidationImpl() {
   bool local_valid = true;
   if (world_.rank() == 0) {
-    if (!task_data || task_data->inputs.empty() || task_data->inputs_count.empty() || task_data->outputs.empty() ||
-        task_data->outputs_count.empty()) {
+    if (!(task_data && !task_data->inputs.empty() && !task_data->inputs_count.empty() && !task_data->outputs.empty() &&
+          !task_data->outputs_count.empty())) {
       local_valid = false;
     } else {
-      auto validate_buffers = [&](const auto& buffers, const auto& counts, size_t& total_size) -> bool {
-        total_size = 0;
-        for (size_t i = 0; i < counts.size(); ++i) {
-          if (buffers[i] == nullptr || counts[i] == 0) {
-            return false;
-          }
-          if (reinterpret_cast<uintptr_t>(buffers[i]) % alignof(uint8_t) != 0) {
-            return false;
-          }
-          total_size += counts[i];
+      size_t total_input_size = 0, total_output_size = 0;
+      for (size_t i = 0; i < task_data->inputs_count.size(); ++i) {
+        if (task_data->inputs[i] == nullptr || task_data->inputs_count[i] == 0 ||
+            (reinterpret_cast<uintptr_t>(task_data->inputs[i]) % alignof(uint8_t)) != 0) {
+          local_valid = false;
+          break;
         }
-        return true;
-      };
-
-      size_t total_input_size = 0;
-      size_t total_output_size = 0;
-      bool input_valid = validate_buffers(task_data->inputs, task_data->inputs_count, total_input_size);
-      bool output_valid = validate_buffers(task_data->outputs, task_data->outputs_count, total_output_size);
-      if (!input_valid || !output_valid || (total_input_size != total_output_size)) {
+        total_input_size += task_data->inputs_count[i];
+      }
+      if (local_valid) {
+        for (size_t i = 0; i < task_data->outputs_count.size(); ++i) {
+          if (task_data->outputs[i] == nullptr || task_data->outputs_count[i] == 0 ||
+              (reinterpret_cast<uintptr_t>(task_data->outputs[i]) % alignof(uint8_t)) != 0) {
+            local_valid = false;
+            break;
+          }
+          total_output_size += task_data->outputs_count[i];
+        }
+      }
+      if (local_valid && (total_input_size != total_output_size)) {
         local_valid = false;
       }
       if (local_valid && (world_.size() > 4)) {
@@ -50,6 +51,7 @@ bool GridTorusTopologyParallel::ValidationImpl() {
     }
   }
   bool global_valid = false;
+  // NOLINTNEXTLINE(misc-include-cleaner)
   boost::mpi::all_reduce(world_, local_valid, global_valid, std::logical_and<>());
   return global_valid;
 }
@@ -64,7 +66,7 @@ bool GridTorusTopologyParallel::RunImpl() {
     return true;
   }
 
-  int grid_dim;
+  int grid_dim = 0;
   if (size <= 4) {
     grid_dim = 2;
   } else {
@@ -73,7 +75,7 @@ bool GridTorusTopologyParallel::RunImpl() {
 
   world_.barrier();
 
-  auto compute_neighbors = [grid_dim, size](int rank) -> std::vector<int> {
+auto compute_neighbors = [grid_dim, size](int rank) -> std::vector<int> {
     int x = rank % grid_dim;
     int y = rank / grid_dim;
 
@@ -85,7 +87,8 @@ bool GridTorusTopologyParallel::RunImpl() {
     std::vector<int> neighbors = {left, right, up, down};
     std::erase_if(neighbors, [size, rank](int r) { return r >= size || r == rank; });
     std::ranges::sort(neighbors);
-    neighbors.erase(std::unique(neighbors.begin(), neighbors.end()), neighbors.end());
+    auto unique_range = std::ranges::unique(neighbors);
+    neighbors.erase(unique_range.begin(), unique_range.end());
     return neighbors;
   };
 
