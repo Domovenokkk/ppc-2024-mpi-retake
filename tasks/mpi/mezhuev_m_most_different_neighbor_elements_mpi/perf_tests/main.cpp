@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <vector>
 
@@ -12,17 +15,15 @@
 
 TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  std::vector<int> in(10000000, 0);
+  std::vector<int> in(10'000'000, 0);
   std::vector<int> out1(2, 0);
   std::vector<int> out2(2, 0);
 
   if (in.size() < 2) {
-    std::cerr << "Error: Input vector size is too small!" << std::endl;
     FAIL();
   }
 
   if (out1.size() < 2 || out2.size() < 2) {
-    std::cerr << "Error: Output vector size is too small!" << std::endl;
     FAIL();
   }
 
@@ -43,7 +44,6 @@ TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_pipeline_run) {
 
   if (task_data_mpi->inputs.empty() || task_data_mpi->outputs.empty() || task_data_mpi->inputs[0] == nullptr ||
       task_data_mpi->outputs[0] == nullptr || task_data_mpi->outputs[1] == nullptr) {
-    std::cerr << "Error: task_data contains null pointers!" << std::endl;
     FAIL();
   }
 
@@ -70,6 +70,7 @@ TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_pipeline_run) {
     ASSERT_GT(std::abs(out1[0] - out2[0]), 0);
   }
 }
+
 
 TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_task_run) {
   boost::mpi::communicator world;

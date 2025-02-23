@@ -1,12 +1,10 @@
 #include "mpi/mezhuev_m_most_different_neighbor_elements_mpi/include/mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/operations.hpp>
 #include <climits>
 #include <cmath>
-#include <cstddef>
 #include <iostream>
 #include <vector>
 
@@ -47,7 +45,7 @@ bool MostDifferentNeighborElements::RunImpl() {
   int delta_size = static_cast<int>(input_.size()) / size;
   int extra_elements = static_cast<int>(input_.size()) % size;
 
-  int start_index = rank * delta_size + std::min(rank, extra_elements);
+  int start_index = (rank * delta_size) + std::min(rank, extra_elements);
   int end_index = start_index + delta_size + (rank < extra_elements ? 1 : 0);
 
   int local_max_diff = 0;
@@ -63,8 +61,9 @@ bool MostDifferentNeighborElements::RunImpl() {
 
   int global_max_diff = 0;
   int global_max_index = -1;
-
+  // NOLINTNEXTLINE(misc-include-cleaner)
   boost::mpi::all_reduce(world_, local_max_diff, global_max_diff, boost::mpi::maximum<int>());
+  // NOLINTNEXTLINE(misc-include-cleaner)
   boost::mpi::all_reduce(world_, local_max_index, global_max_index, boost::mpi::maximum<int>());
 
   if (rank == 0) {
@@ -72,7 +71,6 @@ bool MostDifferentNeighborElements::RunImpl() {
       result_.first = input_[global_max_index];
       result_.second = input_[global_max_index + 1];
     } else {
-      std::cerr << "Error: No valid index found!" << std::endl;
       return false;
     }
   }

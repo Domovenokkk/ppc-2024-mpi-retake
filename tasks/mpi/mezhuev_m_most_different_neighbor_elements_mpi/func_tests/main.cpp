@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
+#include <algorithm>
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cmath>
-#include <iostream>
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <numeric>
+#include <ranges>
 #include <vector>
 
 #include "mpi/mezhuev_m_most_different_neighbor_elements_mpi/include/mpi.hpp"
@@ -14,7 +15,7 @@
 TEST(MostDifferentNeighborElementsMPI, HandlesLargeInput) {
   boost::mpi::communicator world;
   std::vector<int> input(10000);
-  std::generate(input.begin(), input.end(), []() { return rand() % 10000; });
+  std::ranges::generate(input, []() { return rand() % 10000; });
   std::vector<int> output1(2, 0);
   std::vector<int> output2(2, 0);
 

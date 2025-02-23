@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <stdexcept>
+#include <cstddef>
+#include <ranges>
 
 namespace mezhuev_m_most_different_neighbor_elements_seq {
 
@@ -70,7 +70,8 @@ bool MostDifferentNeighborElements::PostProcessingImpl() {
   }
 
   int* output_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
-  std::copy(result_.begin(), result_.end(), output_ptr);
+  std::ranges::copy(result_, output_ptr);
+
   return true;
 }
 

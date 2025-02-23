@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -47,9 +46,9 @@ TEST(mezhuev_m_most_different_neighbor_elements_seq, PipelineRunPerformance) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-
-  ASSERT_EQ(output_data.size(), 2);
+  ASSERT_EQ(static_cast<size_t>(output_data.size()), 2);
 }
+
 
 TEST(mezhuev_m_most_different_neighbor_elements_seq, TaskRunPerformance) {
   constexpr int kTestSize = 5000000;
@@ -88,5 +87,5 @@ TEST(mezhuev_m_most_different_neighbor_elements_seq, TaskRunPerformance) {
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  ASSERT_EQ(output_data.size(), 2);
+  ASSERT_EQ(static_cast<size_t>(output_data.size()), 2);
 }

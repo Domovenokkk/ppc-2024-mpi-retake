@@ -1,4 +1,5 @@
-#include <algorithm>
+#include <memory>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -14,7 +15,7 @@ class MostDifferentNeighborElements : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  const std::vector<int>& getResult() const { return result_; }
+  const std::vector<int>& GetResult() const { return result_; }
 
  private:
   std::vector<int> input_;

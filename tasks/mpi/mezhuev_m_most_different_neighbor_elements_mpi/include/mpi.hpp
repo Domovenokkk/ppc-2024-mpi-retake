@@ -3,7 +3,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
-#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>
