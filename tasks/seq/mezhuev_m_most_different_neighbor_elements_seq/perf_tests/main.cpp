@@ -13,7 +13,7 @@
 #include "seq/mezhuev_m_most_different_neighbor_elements_seq/include/seq.hpp"
 
 TEST(mezhuev_m_most_different_neighbor_elements_seq, PipelineRunPerformance) {
-  constexpr int kTestSize = 5000000;
+  constexpr int kTestSize = 10000000;
 
   std::vector<int> input_data(kTestSize);
   std::vector<int> output_data(2);
@@ -52,7 +52,7 @@ TEST(mezhuev_m_most_different_neighbor_elements_seq, PipelineRunPerformance) {
 }
 
 TEST(mezhuev_m_most_different_neighbor_elements_seq, TaskRunPerformance) {
-  constexpr int kTestSize = 5000000;
+  constexpr int kTestSize = 10000000;
 
   std::vector<int> input_data(kTestSize);
   std::vector<int> output_data(2);
