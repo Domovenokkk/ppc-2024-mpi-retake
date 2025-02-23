@@ -9,7 +9,7 @@
 #include <numeric>
 #include <vector>
 
-#include "core/task/include/task.hpp" 
+#include "core/task/include/task.hpp"
 #include "mpi/mezhuev_m_most_different_neighbor_elements_mpi/include/mpi.hpp"
 
 TEST(MostDifferentNeighborElementsMPI, HandlesLargeInput) {
