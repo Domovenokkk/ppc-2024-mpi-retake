@@ -15,7 +15,7 @@ class MostDifferentNeighborElements : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  const std::vector<int>& GetResult() const { return result_; }
+  [[nodiscard]] const std::vector<int>& GetResult() const { return result_; }
 
  private:
   std::vector<int> input_;

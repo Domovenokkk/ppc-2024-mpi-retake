@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <random>
 #include <vector>
@@ -47,7 +48,7 @@ TEST(mezhuev_m_most_different_neighbor_elements_seq, PipelineRunPerformance) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  ASSERT_EQ(static_cast<size_t>(output_data.size()), 2);
+  EXPECT_EQ(output_data.size(), static_cast<size_t>(2));
 }
 
 TEST(mezhuev_m_most_different_neighbor_elements_seq, TaskRunPerformance) {
@@ -87,5 +88,5 @@ TEST(mezhuev_m_most_different_neighbor_elements_seq, TaskRunPerformance) {
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  ASSERT_EQ(static_cast<size_t>(output_data.size()), 2);
+  EXPECT_EQ(output_data.size(), static_cast<size_t>(2));
 }

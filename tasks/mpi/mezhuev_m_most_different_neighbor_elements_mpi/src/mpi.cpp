@@ -5,7 +5,6 @@
 #include <boost/mpi/operations.hpp>
 #include <climits>
 #include <cmath>
-#include <iostream>
 #include <vector>
 
 namespace mezhuev_m_most_different_neighbor_elements_mpi {
