@@ -71,7 +71,6 @@ TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_pipeline_run) {
   }
 }
 
-
 TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::vector<int> in(10000000);

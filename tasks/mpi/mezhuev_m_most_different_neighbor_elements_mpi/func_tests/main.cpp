@@ -7,7 +7,6 @@
 #include <cstdlib>
 #include <memory>
 #include <numeric>
-#include <ranges>
 #include <vector>
 
 #include "mpi/mezhuev_m_most_different_neighbor_elements_mpi/include/mpi.hpp"
@@ -133,7 +132,7 @@ TEST(mezhuev_m_most_different_neighbor_elements_mpi, HandlesSequentialNumbers) {
 TEST(mezhuev_m_most_different_neighbor_elements_mpi, HandlesLargeRandomInput) {
   boost::mpi::communicator world;
   std::vector<int> input(100000);
-  std::generate(input.begin(), input.end(), []() { return rand() % 100000; });
+  std::ranges::generate(input.begin(), input.end(), []() { return rand() % 100000; });
   std::vector<int> output1(2, 0);
   std::vector<int> output2(2, 0);
 

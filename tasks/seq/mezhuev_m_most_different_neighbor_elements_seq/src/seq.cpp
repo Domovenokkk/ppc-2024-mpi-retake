@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <ranges>
 
 namespace mezhuev_m_most_different_neighbor_elements_seq {
 
