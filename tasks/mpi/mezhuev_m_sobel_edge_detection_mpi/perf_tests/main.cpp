@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/mpi/environment.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -27,7 +26,7 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_pipeline_run) {
 
   for (size_t y = 0; y < kHeight; ++y) {
     for (size_t x = 0; x < kWidth; ++x) {
-      in[y * kWidth + x] = static_cast<uint8_t>((x + y) % 256);
+      in[(y * kWidth) + x] = static_cast<uint8_t>((x + y) % 256);
     }
   }
 
@@ -82,7 +81,7 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_task_run) {
 
   for (size_t y = 0; y < kHeight; ++y) {
     for (size_t x = 0; x < kWidth; ++x) {
-      in[y * kWidth + x] = static_cast<uint8_t>((x + y) % 256);
+      in[(y * kWidth) + x] = static_cast<uint8_t>((x + y) % 256);
     }
   }
 

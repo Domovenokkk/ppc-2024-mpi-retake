@@ -20,7 +20,7 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_pipeline_run) {
 
   for (size_t y = 0; y < kHeight; ++y) {
     for (size_t x = 0; x < kWidth; ++x) {
-      in[y * kWidth + x] = static_cast<uint8_t>((x + y) % 256);
+      in[(y * kWidth) + x] = static_cast<uint8_t>((x + y) % 256);
     }
   }
 
@@ -66,7 +66,7 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_task_run) {
 
   for (size_t y = 0; y < kHeight; ++y) {
     for (size_t x = 0; x < kWidth; ++x) {
-      in[y * kWidth + x] = static_cast<uint8_t>((x + y) % 256);
+      in[(y * kWidth) + x] = static_cast<uint8_t>((x + y) % 256);
     }
   }
 

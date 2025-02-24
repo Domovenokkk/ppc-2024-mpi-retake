@@ -1,13 +1,7 @@
-#include <gtest/gtest.h>
-
-#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cmath>
 #include <memory>
-#include <numeric>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -25,13 +19,13 @@ class SobelEdgeDetection : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  const std::vector<int>& get_gradient_x() const { return gradient_x; }
-  const std::vector<int>& get_gradient_y() const { return gradient_y; }
+  [[nodiscard]] const std::vector<int>& GetGradientX() const { return gradient_x_; }
+  [[nodiscard]] const std::vector<int>& GetGradientY() const { return gradient_y_; }
 
  private:
   boost::mpi::communicator& world_;
-  std::vector<int> gradient_x;
-  std::vector<int> gradient_y;
+  std::vector<int> gradient_x_;
+  std::vector<int> gradient_y_;
 };
 
 }  // namespace mezhuev_m_sobel_edge_detection_mpi

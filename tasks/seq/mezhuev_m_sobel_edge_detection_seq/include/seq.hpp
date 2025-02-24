@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdint>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -17,8 +18,8 @@ class SobelEdgeDetectionSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int16_t> gradient_x;
-  std::vector<int16_t> gradient_y;
+  std::vector<int16_t> gradient_x_;
+  std::vector<int16_t> gradient_y_;
 };
 
 }  // namespace mezhuev_m_sobel_edge_detection_seq
