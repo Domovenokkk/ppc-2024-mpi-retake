@@ -4,7 +4,7 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <cmath>
-#include <cstddef> 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -16,12 +16,17 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_basic_case) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 
-  constexpr int kWidth = 5, kHeight = 5, kImageSize = kWidth * kHeight;
-  std::vector<uint8_t> in(kImageSize, 0), out(kImageSize, 0);
+  constexpr int kWidth = 5;
+  constexpr int kHeight = 5;
+  constexpr int kImageSize = kWidth * kHeight;
+  std::vector<uint8_t> in(kImageSize, 0);
+  std::vector<uint8_t> out(kImageSize, 0);
 
-  for (size_t y = 0; y < kHeight; ++y)
-    for (size_t x = 0; x < kWidth; ++x) in[(y * kWidth) + x] = static_cast<uint8_t>(x * 50);
-
+  for (size_t y = 0; y < kHeight; ++y) {
+    for (size_t x = 0; x < kWidth; ++x) {
+      in[(y * kWidth) + x] = static_cast<uint8_t>(x * 50);
+    }
+  }
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {kImageSize};
@@ -33,14 +38,17 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_basic_case) {
   ASSERT_TRUE(sobel_task->PreProcessingImpl() && sobel_task->RunImpl() && sobel_task->ValidationImpl() &&
               sobel_task->PostProcessingImpl());
 
-  if (world.rank() == 0) ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  if (world.rank() == 0) {
+    ASSERT_TRUE(std::ranges::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  }
 }
 
 TEST(mezhuev_m_sobel_edge_detection_mpi, test_small_image_3x3) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 
-  std::vector<uint8_t> in(9, 255), out(9, 0);
+  std::vector<uint8_t> in(9, 255);
+  std::vector<uint8_t> out(9, 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {static_cast<uint32_t>(in.size())};
@@ -51,7 +59,9 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_small_image_3x3) {
   ASSERT_TRUE(sobel_task->PreProcessingImpl() && sobel_task->RunImpl() && sobel_task->ValidationImpl() &&
               sobel_task->PostProcessingImpl());
 
-  if (world.rank() == 0) ASSERT_TRUE(std::all_of(out.begin(), out.end(), [](uint8_t val) { return val == 0; }));
+  if (world.rank() == 0) {
+    ASSERT_TRUE(std::ranges::all_of(out.begin(), out.end(), [](uint8_t val) { return val == 0; }));
+  }
 }
 
 TEST(mezhuev_m_sobel_edge_detection_mpi, test_empty_input) {
@@ -68,7 +78,8 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_single_bright_pixel) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 
-  std::vector<uint8_t> in(25, 0), out(25, 0);
+  std::vector<uint8_t> in(25, 0);
+  std::vector<uint8_t> out(25, 0);
   in[12] = 255;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -81,14 +92,17 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_single_bright_pixel) {
   ASSERT_TRUE(sobel_task->PreProcessingImpl() && sobel_task->RunImpl() && sobel_task->ValidationImpl() &&
               sobel_task->PostProcessingImpl());
 
-  if (world.rank() == 0) ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  if (world.rank() == 0) {
+    ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  }
 }
 
 TEST(mezhuev_m_sobel_edge_detection_mpi, test_large_image) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 
-  std::vector<uint8_t> in(1024 * 1024, 128), out(1024 * 1024, 0);
+  std::vector<uint8_t> in(1024 * 1024, 128);
+  std::vector<uint8_t> out(1024 * 1024, 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
@@ -105,10 +119,13 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_vertical_gradient) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 
-  std::vector<uint8_t> in(25, 0), out(25, 0);
-  for (size_t y = 0; y < 5; ++y)
-    for (size_t x = 0; x < 5; ++x) in[y * 5 + x] = static_cast<uint8_t>(y * 50);
-
+  std::vector<uint8_t> in(25, 0);
+  std::vector<uint8_t> out(25, 0);
+  for (size_t y = 0; y < 5; ++y) {
+    for (size_t x = 0; x < 5; ++x) {
+      in[(y * 5) + x] = static_cast<uint8_t>(y * 50);
+    }
+  }
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {static_cast<uint32_t>(in.size())};
@@ -119,14 +136,17 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_vertical_gradient) {
   ASSERT_TRUE(sobel_task->PreProcessingImpl() && sobel_task->RunImpl() && sobel_task->ValidationImpl() &&
               sobel_task->PostProcessingImpl());
 
-  if (world.rank() == 0) ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  if (world.rank() == 0) {
+    ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  }
 }
 
 TEST(mezhuev_m_sobel_edge_detection_mpi, test_black_image) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 
-  std::vector<uint8_t> in(25, 0), out(25, 0);
+  std::vector<uint8_t> in(25, 0);
+  std::vector<uint8_t> out(25, 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
@@ -138,5 +158,7 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_black_image) {
   ASSERT_TRUE(sobel_task->PreProcessingImpl() && sobel_task->RunImpl() && sobel_task->ValidationImpl() &&
               sobel_task->PostProcessingImpl());
 
-  if (world.rank() == 0) ASSERT_TRUE(std::all_of(out.begin(), out.end(), [](uint8_t val) { return val == 0; }));
+  if (world.rank() == 0) {
+    ASSERT_TRUE(std::ranges::all_of(out.begin(), out.end(), [](uint8_t val) { return val == 0; }));
+  }
 }

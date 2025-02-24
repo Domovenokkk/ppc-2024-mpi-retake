@@ -6,18 +6,24 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "seq/mezhuev_m_sobel_edge_detection_seq/include/seq.hpp"
 
 TEST(mezhuev_m_sobel_edge_detection_seq, test_basic_case) {
-  constexpr int kWidth = 5, kHeight = 5, kImageSize = kWidth * kHeight;
-  std::vector<uint8_t> in(kImageSize, 0), out(kImageSize, 0);
+  constexpr int kWidth = 5;
+  constexpr int kHeight = 5;
+  constexpr int kImageSize = kWidth * kHeight;
+  std::vector<uint8_t> in(kImageSize, 0);
+  std::vector<uint8_t> out(kImageSize, 0);
 
-  for (size_t y = 0; y < kHeight; ++y)
-    for (size_t x = 0; x < kWidth; ++x) in[(y * kWidth) + x] = static_cast<uint8_t>(x * 50);
-
+  for (size_t y = 0; y < kHeight; ++y) {
+    for (size_t x = 0; x < kWidth; ++x) {
+      in[(y * kWidth) + x] = static_cast<uint8_t>(x * 50);
+    }
+  }
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {kImageSize};
@@ -27,11 +33,12 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_basic_case) {
   auto sobel_task = std::make_shared<mezhuev_m_sobel_edge_detection_seq::SobelEdgeDetectionSeq>(task_data);
   ASSERT_TRUE(sobel_task->PreProcessingImpl() && sobel_task->RunImpl() && sobel_task->ValidationImpl() &&
               sobel_task->PostProcessingImpl());
-  ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  ASSERT_TRUE(std::ranges::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
 }
 
 TEST(mezhuev_m_sobel_edge_detection_seq, test_uniform_image) {
-  std::vector<uint8_t> in(25, 128), out(25, 0);
+  std::vector<uint8_t> in(25, 128);
+  std::vector<uint8_t> out(25, 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {static_cast<uint32_t>(in.size())};
@@ -52,10 +59,13 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_empty_input) {
 }
 
 TEST(mezhuev_m_sobel_edge_detection_seq, test_sharp_contrast) {
-  std::vector<uint8_t> in(25, 0), out(25, 0);
-  for (size_t y = 0; y < 5; ++y)
-    for (size_t x = 0; x < 5; ++x) in[(y * 5) + x] = (x < 2) ? 0 : 255;
-
+  std::vector<uint8_t> in(25, 0);
+  std::vector<uint8_t> out(25, 0);
+  for (size_t y = 0; y < 5; ++y) {
+    for (size_t x = 0; x < 5; ++x) {
+      in[(y * 5) + x] = (x < 2) ? 0 : 255;
+    }
+  }
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {static_cast<uint32_t>(in.size())};
@@ -65,11 +75,12 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_sharp_contrast) {
   auto sobel_task = std::make_shared<mezhuev_m_sobel_edge_detection_seq::SobelEdgeDetectionSeq>(task_data);
   ASSERT_TRUE(sobel_task->PreProcessingImpl() && sobel_task->RunImpl() && sobel_task->ValidationImpl() &&
               sobel_task->PostProcessingImpl());
-  ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+  ASSERT_TRUE(std::ranges::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
 }
 
 TEST(mezhuev_m_sobel_edge_detection_seq, test_small_image) {
-  std::vector<uint8_t> in(9, 255), out(9, 0);
+  std::vector<uint8_t> in(9, 255);
+  std::vector<uint8_t> out(9, 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {static_cast<uint32_t>(in.size())};
@@ -83,8 +94,11 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_small_image) {
 }
 
 TEST(mezhuev_m_sobel_edge_detection_seq, test_noisy_image) {
-  std::vector<uint8_t> in(100, 0), out(100, 0);
-  for (uint8_t &val : in) val = static_cast<uint8_t>(rand() % 256);
+  std::vector<uint8_t> in(100, 0);
+  std::vector<uint8_t> out(100, 0);
+  for (uint8_t &val : in) {
+    val = static_cast<uint8_t>(rand() % 256);
+  }
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
@@ -99,7 +113,10 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_noisy_image) {
 }
 
 TEST(mezhuev_m_sobel_edge_detection_seq, test_too_small_images) {
-  std::vector<uint8_t> in1(1, 128), out1(1, 0), in2(4, 255), out2(4, 0);
+  std::vector<uint8_t> in1(1, 128);
+  std::vector<uint8_t> out1(1, 0);
+  std::vector<uint8_t> in2(4, 255);
+  std::vector<uint8_t> out2(4, 0);
   auto task_data1 = std::make_shared<ppc::core::TaskData>(), task_data2 = std::make_shared<ppc::core::TaskData>();
 
   task_data1->inputs = {in1.data()};
@@ -120,10 +137,13 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_too_small_images) {
 }
 
 TEST(mezhuev_m_sobel_edge_detection_seq, test_horizontal_gradient) {
-  std::vector<uint8_t> in(25, 0), out(25, 0);
-  for (size_t y = 0; y < 5; ++y)
-    for (size_t x = 0; x < 5; ++x) in[(y * 5) + x] = static_cast<uint8_t>(x * 50);
-
+  std::vector<uint8_t> in(25, 0);
+  std::vector<uint8_t> out(25, 0);
+  for (size_t y = 0; y < 5; ++y) {
+    for (size_t x = 0; x < 5; ++x) {
+      in[(y * 5) + x] = static_cast<uint8_t>(x * 50);
+    }
+  }
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs = {in.data()};
   task_data->inputs_count = {static_cast<uint32_t>(in.size())};

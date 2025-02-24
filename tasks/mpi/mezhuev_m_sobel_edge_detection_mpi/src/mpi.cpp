@@ -2,9 +2,9 @@
 
 #include <algorithm>
 #include <boost/mpi/communicator.hpp>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cmath>
 #include <vector>
 
 namespace mezhuev_m_sobel_edge_detection_mpi {
@@ -59,56 +59,64 @@ bool SobelEdgeDetection::RunImpl() {
   }
 
   boost::mpi::communicator world;
-  int rank = world.rank(), size = world.size();
+  int rank = world.rank();
+  int size = world.size();
   auto width = static_cast<size_t>(std::sqrt(task_data->inputs_count[0]));
   auto height = width;
-  if (height < 3 || width < 3) return false;
+  if (height < 3 || width < 3) {
+    return false;
+  }
 
   uint8_t* input = task_data->inputs[0];
   uint8_t* output = task_data->outputs[0];
 
-  size_t rows_per_proc = height / size, extra_rows = height % size;
+  size_t rows_per_proc = height / size;
+  size_t extra_rows = height % size;
   size_t start_row = (rank * rows_per_proc) + std::min(rank, static_cast<int>(extra_rows));
   size_t end_row = ((rank + 1) * rows_per_proc) + std::min(rank + 1, static_cast<int>(extra_rows));
 
-  auto exchangeBoundaries = [&](int rank, int size) {
+  auto exchange_boundaries = [&](int rank, int size) {
     if (rank > 0) {
-      world.send(rank - 1, 0, input + (start_row * width), width);
-      world.recv(rank - 1, 0, input + ((start_row - 1) * width), width);
+      world.send(rank - 1, 0, input + (start_row * width), static_cast<int>(width));
+      world.recv(rank - 1, 0, input + ((start_row - 1) * width), static_cast<int>(width));
     }
     if (rank < size - 1) {
-      world.recv(rank + 1, 0, input + (end_row * width), width);
-      world.send(rank + 1, 0, input + ((end_row - 1) * width), width);
+      world.recv(rank + 1, 0, input + (end_row * width), static_cast<int>(width));
+      world.send(rank + 1, 0, input + ((end_row - 1) * width), static_cast<int>(width));
     }
   };
-  exchangeBoundaries(rank, size);
+  exchange_boundaries(rank, size);
 
-  auto applySobel = [&](size_t y, size_t x) -> uint8_t {
+  auto apply_sobel = [&](size_t y, size_t x) -> uint8_t {
     static constexpr int kSobelX[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
     static constexpr int kSobelY[3][3] = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
 
-    int gx = 0, gy = 0;
-    for (int ky = -1; ky <= 1; ++ky)
+    int gx = 0;
+    int gy = 0;
+    for (int ky = -1; ky <= 1; ++ky) {
       for (int kx = -1; kx <= 1; ++kx) {
         uint8_t pixel = input[((y + ky) * width) + (x + kx)];
         gx += kSobelX[ky + 1][kx + 1] * pixel;
         gy += kSobelY[ky + 1][kx + 1] * pixel;
       }
-
+    }
     return static_cast<uint8_t>(std::min(std::sqrt((gx * gx) + (gy * gy)), 255.0));
   };
 
-  for (size_t y = std::max(start_row, size_t(1)); y < std::min(end_row, height - 1); ++y)
-    for (size_t x = 1; x < width - 1; ++x) output[(y * width) + x] = applySobel(y, x);
+  for (size_t y = std::max(start_row, size_t(1)); y < std::min(end_row, height - 1); ++y) {
+    for (size_t x = 1; x < width - 1; ++x) {
+      output[(y * width) + x] = apply_sobel(y, x);
+    }
+  }
 
   if (rank == 0) {
     for (int i = 1; i < size; ++i) {
       size_t ws = (i * rows_per_proc) + std::min(i, static_cast<int>(extra_rows));
       size_t we = ((i + 1) * rows_per_proc) + std::min(i + 1, static_cast<int>(extra_rows));
-      world.recv(i, 0, output + (ws * width), (we - ws) * width);
+      world.recv(i, 0, output + (ws * width), static_cast<int>((we - ws) * width));
     }
   } else {
-    world.send(0, 0, output + (start_row * width), (end_row - start_row) * width);
+    world.send(0, 0, output + (start_row * width), static_cast<int>((end_row - start_row) * width));
   }
 
   return true;
