@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -117,7 +116,8 @@ TEST(mezhuev_m_sobel_edge_detection_seq, test_too_small_images) {
   std::vector<uint8_t> out1(1, 0);
   std::vector<uint8_t> in2(4, 255);
   std::vector<uint8_t> out2(4, 0);
-  auto task_data1 = std::make_shared<ppc::core::TaskData>(), task_data2 = std::make_shared<ppc::core::TaskData>();
+  auto task_data1 = std::make_shared<ppc::core::TaskData>();
+  auto task_data2 = std::make_shared<ppc::core::TaskData>();
 
   task_data1->inputs = {in1.data()};
   task_data1->inputs_count = {static_cast<uint32_t>(in1.size())};

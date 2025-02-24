@@ -122,7 +122,6 @@ bool SobelEdgeDetection::RunImpl() {
   return true;
 }
 
-
 bool SobelEdgeDetection::PostProcessingImpl() {
   if (!task_data || task_data->outputs.empty() || task_data->outputs[0] == nullptr) {
     return false;

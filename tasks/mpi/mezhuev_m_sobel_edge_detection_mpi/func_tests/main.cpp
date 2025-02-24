@@ -93,7 +93,7 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_single_bright_pixel) {
               sobel_task->PostProcessingImpl());
 
   if (world.rank() == 0) {
-    ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+    ASSERT_TRUE(std::ranges::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
   }
 }
 
@@ -137,7 +137,7 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_vertical_gradient) {
               sobel_task->PostProcessingImpl());
 
   if (world.rank() == 0) {
-    ASSERT_TRUE(std::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
+    ASSERT_TRUE(std::ranges::any_of(out.begin(), out.end(), [](uint8_t val) { return val > 0; }));
   }
 }
 
