@@ -57,10 +57,8 @@ bool SobelEdgeDetection::RunImpl() {
       task_data->outputs_count.empty()) {
     return false;
   }
-
-  boost::mpi::communicator world;
-  int rank = world.rank();
-  int size = world.size();
+  int rank = world_.rank();
+  int size = world_.size();
   auto width = static_cast<size_t>(std::sqrt(task_data->inputs_count[0]));
   auto height = width;
   if (height < 3 || width < 3) {
@@ -77,12 +75,12 @@ bool SobelEdgeDetection::RunImpl() {
 
   auto exchange_boundaries = [&](int rank, int size) {
     if (rank > 0) {
-      world.send(rank - 1, 0, input + (start_row * width), static_cast<int>(width));
-      world.recv(rank - 1, 0, input + ((start_row - 1) * width), static_cast<int>(width));
+      world_.send(rank - 1, 0, input + (start_row * width), static_cast<int>(width));
+      world_.recv(rank - 1, 0, input + ((start_row - 1) * width), static_cast<int>(width));
     }
     if (rank < size - 1) {
-      world.recv(rank + 1, 0, input + (end_row * width), static_cast<int>(width));
-      world.send(rank + 1, 0, input + ((end_row - 1) * width), static_cast<int>(width));
+      world_.recv(rank + 1, 0, input + (end_row * width), static_cast<int>(width));
+      world_.send(rank + 1, 0, input + ((end_row - 1) * width), static_cast<int>(width));
     }
   };
   exchange_boundaries(rank, size);
@@ -113,10 +111,10 @@ bool SobelEdgeDetection::RunImpl() {
     for (int i = 1; i < size; ++i) {
       size_t ws = (i * rows_per_proc) + std::min(i, static_cast<int>(extra_rows));
       size_t we = ((i + 1) * rows_per_proc) + std::min(i + 1, static_cast<int>(extra_rows));
-      world.recv(i, 0, output + (ws * width), static_cast<int>((we - ws) * width));
+      world_.recv(i, 0, output + (ws * width), static_cast<int>((we - ws) * width));
     }
   } else {
-    world.send(0, 0, output + (start_row * width), static_cast<int>((end_row - start_row) * width));
+    world_.send(0, 0, output + (start_row * width), static_cast<int>((end_row - start_row) * width));
   }
 
   return true;
